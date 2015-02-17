@@ -1,33 +1,46 @@
 require 'active_mocker/mock'
 
 class ReportTypeMock < ActiveMocker::Mock::Base
+  created_with('1.7.3')
 
   class << self
 
     def attributes
-      @attributes ||= HashWithIndifferentAccess.new({"id" => nil, "name" => nil, "report_family_id" => nil})
+      @attributes ||= HashWithIndifferentAccess.new({ "id" => nil, "name" => nil, "report_family_id" => nil }).merge(super)
     end
 
     def types
-      @types ||= ActiveMocker::Mock::HashProcess.new({id: Fixnum, name: String, report_family_id: Fixnum}, method(:build_type))
+      @types ||= ActiveMocker::Mock::HashProcess.new({ id: Fixnum, name: String, report_family_id: Fixnum }, method(:build_type)).merge(super)
     end
 
     def associations
-      @associations ||= {}
+      @associations ||= {}.merge(super)
+    end
+
+    def associations_by_class
+      @associations_by_class ||= {}.merge(super)
     end
 
     def mocked_class
-      'ReportType'
+      "ReportType"
     end
 
     private :mocked_class
 
     def attribute_names
-      @attribute_names ||= ["id", "name", "report_family_id"]
+      @attribute_names ||= ["id", "name", "report_family_id"] | super
     end
 
     def primary_key
       "id"
+    end
+
+    def abstract_class?
+      false
+    end
+
+    def table_name
+      "report_types" || super
     end
 
   end
@@ -66,6 +79,7 @@ class ReportTypeMock < ActiveMocker::Mock::Base
 
 
   module Scopes
+    include ActiveMocker::Mock::Base::Scopes
 
   end
 
@@ -87,11 +101,5 @@ class ReportTypeMock < ActiveMocker::Mock::Base
   #        Model Methods           #
   ##################################
 
-
-  private
-
-  def self.reload
-    load __FILE__
-  end
 
 end
